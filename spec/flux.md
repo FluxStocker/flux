@@ -49,10 +49,23 @@ Los nombres válidos de actions y filters, con sus payloads, están en
 [`hooks.md`](hooks.md). Usar un nombre que no existe no es un error: el handler
 simplemente no se dispara nunca (el punto puede sembrarse en una versión futura).
 
+## `flux.db.*` y `flux.notify` — fachada de dominio
+
+Acceso a datos y capacidades de negocio, gateado por los `permissions` del manifest:
+solo se montan las fachadas de los scopes declarados (sin el scope, la propiedad no
+existe). Catálogo completo con firmas y DTOs en [`scopes.md`](scopes.md).
+
+```js
+// requiere "products.read" en el manifest
+var page = flux.db.products.list({ search: 'café', limit: 10 })
+flux.log(page.total + ' resultados')
+
+// requiere "notify"
+flux.notify(userId, 'Título', 'Cuerpo opcional', '/products')
+```
+
 ## En preparación (no usar todavía)
 
-- `flux.db.*` — acceso a datos de dominio gateado por los `permissions` del manifest.
-- `flux.notify(...)` — notificaciones a usuarios (campana/toast).
 - `flux.http.*` — cliente HTTP saliente.
 - `flux.settings.*` — configuración propia del complemento.
 - `flux.route(...)` — rutas HTTP propias.
