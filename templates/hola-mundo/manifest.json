@@ -1,0 +1,13 @@
+{
+  "name": "hola-mundo",
+  "title": "Hola Mundo",
+  "description": "Plugin de ejemplo para probar el gestor de complementos.",
+  "version": "0.1.0",
+  "author": "FluxStock",
+  "type": "script",
+  "main": "main.js",
+  "permissions": [
+    "sales.read"
+  ],
+  "client": "client.js"
+}
