@@ -6,6 +6,7 @@
   "author": "FluxStock",
   "type": "script",
   "main": "main.js",
+  "image": "icon.png",
   "permissions": [
     "sales.read"
   ],
