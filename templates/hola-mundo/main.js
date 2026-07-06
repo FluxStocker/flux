@@ -18,3 +18,9 @@ flux.onAction('sale.confirmed', function (payload) {
 // flux.onFilter('sale.total', function (total, ctx) {
 //   return total * 0.9
 // })
+
+// Datos para el client.js (los pide con flux.client.data()); ctx trae el usuario de
+// la sesión. Descomenta para probar:
+// flux.onData(function (ctx) {
+//   return { saludo: 'hola ' + (ctx.user && ctx.user.name) }
+// })

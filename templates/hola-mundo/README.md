@@ -15,4 +15,4 @@ lateral del lado navegador (`client.js`).
 
 - `manifest.json` — identidad y entradas ([spec](../../spec/manifest.md)).
 - `main.js` — servidor: `flux.onAction` / `flux.onFilter` ([spec](../../spec/flux.md)).
-- `client.js` — navegador: `fluxUI.panel` ([spec](../../spec/flux-client.md)).
+- `client.js` — navegador: `flux.client.panel` ([spec](../../spec/flux-client.md)).

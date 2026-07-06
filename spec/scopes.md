@@ -33,6 +33,21 @@ Leer las ventas. Monta `flux.db.sales`:
 `Sale`: `{ id, total, paid, change, status, point_of_sale_id, customer_id, user_id, created_at }`
 `SaleItem`: `{ product_id, warehouse_id, quantity, unit_price }`
 
+## `activity.read`
+
+Leer el registro de actividad (quién hizo qué y con qué resultado). Monta
+`flux.db.activity`:
+
+- `flux.db.activity.list(opts?)` → `{ data: Activity[], total: number }`
+  - `opts`: `{ user_id?: number (0 = todos), status?: string, search?: string, limit?: number (30, máx 200), offset?: number }`
+- `flux.db.activity.get(id)` → `Activity & { details: string } | null`
+
+`Activity`: `{ id, user_id, user_name, method, path, action, status, status_code, created_at }`
+
+> El core acota lo que cada usuario ve (todo con `logs.view`, solo lo suyo con
+> `logs.view_own`). Un plugin de confianza replica esa política filtrando por
+> `user_id` con el usuario que le pasa `flux.onData(ctx)`.
+
 ## `notify`
 
 Enviar notificaciones a usuarios (campana + push en vivo). Monta `flux.notify`:

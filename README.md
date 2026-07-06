@@ -32,8 +32,8 @@ flux.onAction('sale.confirmed', function (payload) {
 
 ```js
 // client.js — corre en el navegador del usuario
-export default function (fluxUI) {
-  fluxUI.panel('products', 'right', {
+export default function (flux) {
+  flux.client.panel('products', 'right', {
     title: 'Mi panel',
     render: (ctx) => '<p>' + ctx.total + ' productos</p>',
   })

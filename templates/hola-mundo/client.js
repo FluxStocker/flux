@@ -1,14 +1,14 @@
 // JS de NAVEGADOR del plugin (módulo ES). El Layout lo importa en runtime y le pasa
-// el puente fluxUI — el espejo del `flux` del servidor. Tipo de complemento visual
-// disponible: PANEL LATERAL (fluxUI.panel) — card en el margen de una vista, lado
-// 'left' o 'right'; varios paneles en la misma posición se apilan y se paginan con
-// las flechas del card.
+// `flux` — el espejo del `flux` del servidor; su superficie de navegador es
+// flux.client. Tipo de complemento visual disponible: PANEL LATERAL
+// (flux.client.panel) — card en el margen de una vista, lado 'left' o 'right'; varios
+// en la misma posición se apilan y se paginan con las flechas del card.
 
-export default function (fluxUI) {
-  fluxUI.log('client.js cargado — extiendo la UI')
+export default function (flux) {
+  flux.client.log('client.js cargado — extiendo la UI')
 
   // Panel derecho en Productos. context viene de la vista: { total, page }.
-  fluxUI.panel('products', 'right', {
+  flux.client.panel('products', 'right', {
     title: 'Hola Mundo',
     description: 'Demo de panel lateral',
     render: function (context) {
@@ -23,7 +23,7 @@ export default function (fluxUI) {
   })
 
   // Segundo panel en la MISMA posición: demuestra el apilado (flechas ‹ 1/2 ›).
-  fluxUI.panel('products', 'right', {
+  flux.client.panel('products', 'right', {
     title: 'Estadísticas',
     description: 'Segundo panel apilado',
     render: function (context) {
@@ -37,7 +37,7 @@ export default function (fluxUI) {
   })
 
   // Panel izquierdo: demuestra el posicionamiento en ambos lados.
-  fluxUI.panel('products', 'left', {
+  flux.client.panel('products', 'left', {
     title: 'Lado izquierdo',
     description: 'Posición izquierda',
     render: function () {

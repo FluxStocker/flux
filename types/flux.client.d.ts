@@ -18,7 +18,7 @@ export interface PanelDef {
 }
 
 /** Vistas con posiciones sembradas (spec/outlets.md). */
-export type PanelView = 'products' | (string & {})
+export type PanelView = 'home' | 'products' | (string & {})
 
 export interface FluxClient {
   /** Identidad del propio complemento. */
@@ -38,9 +38,20 @@ export interface FluxClient {
     message(message: string): void
   }
 
+  /**
+   * Datos del servidor: ejecuta el proveedor `flux.onData(...)` del main.js del
+   * plugin (goja) y devuelve su resultado. Es el canal server→client.
+   */
+  data<T = unknown>(): Promise<T>
+
   /** console.log con prefijo [plugin:<name>]. */
   log(...args: unknown[]): void
 }
 
+/** Objeto que recibe client.js. La superficie de navegador es `flux.client`. */
+export interface Flux {
+  readonly client: FluxClient
+}
+
 /** Forma que debe exportar client.js. */
-export type ClientSetup = (fluxUI: FluxClient) => void
+export type ClientSetup = (flux: Flux) => void

@@ -43,6 +43,23 @@ flux.onFilter('sale.total', function (total, ctx) {
   registrado en el log).
 - Varios complementos se encadenan: cada uno recibe el resultado del anterior.
 
+## `flux.onData(handler)`
+
+Registra el **proveedor de datos** para el `client.js` del complemento — el canal
+server→client. El handler recibe un contexto (`{ user }` con el usuario de la sesión)
+y devuelve un valor JSON-able. El navegador lo obtiene con `flux.client.data()`
+([`flux-client.md`](flux-client.md)), que hace `fetch` a `/plugins/<nombre>/data`.
+
+```js
+flux.onData(function (ctx) {
+  // requiere el scope adecuado en el manifest para leer del core
+  return { saludo: 'hola ' + ctx.user.name }
+})
+```
+
+- Un complemento, un proveedor (el último registro vale).
+- Corre en la VM del plugin, serializado con su candado (handlers rápidos).
+
 ## Catálogos
 
 Los nombres válidos de actions y filters, con sus payloads, están en
