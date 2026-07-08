@@ -9,7 +9,7 @@ Todo complemento vive en su propia carpeta (`storage/app/plugins/<name>/`) con u
   "name": "Mi Plugin",
   "description": "Qué hace, en una frase.",
   "version": "1.0.0",
-  "author": "Tu Nombre",
+  "author": { "name": "Nombre Del Desarrollador", "email": "dev@ejemplo.com" },
   "type": "script",
   "kind": "panel",
   "main": "dist/server.js",
@@ -25,7 +25,7 @@ Todo complemento vive en su propia carpeta (`storage/app/plugins/<name>/`) con u
 | `name` | — | Nombre visible (por defecto, `package_name`) |
 | `description` | — | Frase que ve el administrador |
 | `version` | ✅ | Versión del complemento (SemVer recomendado) |
-| `author` | — | Autor visible |
+| `author` | — | `{ name, email }` — **calculado**: lo sella el host con el desarrollador autenticado al crear el complemento (UI o `plugin:make`); no se edita a mano |
 | `type` | ✅ | `script` (JS embebido) o `service` (proceso externo — en preparación) |
 | `kind` | — | Tipo visual: `panel` (card lateral) o `view` (página completa); por defecto `panel` |
 | `main` | ✅ | Entrada del lado servidor, relativa a la carpeta |
