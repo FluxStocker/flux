@@ -1,10 +1,21 @@
-// Plugin de ejemplo: demuestra las tres primitivas del objeto `flux`.
-// El cuerpo de este archivo corre UNA vez al arrancar la app (fase de registro);
-// los callbacks corren cada vez que el core dispara el hook.
+// Plugin de ejemplo: demuestra las primitivas del objeto `flux` en su orden.
+//
+// CICLO DE VIDA — dos fases:
+//   1. REGISTRO: el cuerpo de este archivo corre UNA vez al cargar el complemento
+//      (arranque, habilitar, o hot reload al cambiar main.js). Aquí solo registras.
+//   2. EJECUCIÓN: cada callback corre cuando ocurre su disparador (ver cada uno).
 
+// flux.log — corre al instante cada vez que lo llamas. Este primero confirma la carga.
 flux.log('cargado — v' + flux.plugin.version)
 
-// Action: reaccionar a un evento (no altera el flujo).
+// FILTER — corre en cada operación, ANTES de validar/persistir: lo que devuelvas es
+// el valor real con el que sigue el flujo. Descomenta para aplicar 10% de descuento
+// a TODAS las ventas:
+// flux.onFilter('sale.total', function (total, ctx) {
+//   return total * 0.9
+// })
+
+// ACTION — corre en cada evento, DESPUÉS de persistir: solo reacciona, no altera nada.
 flux.onAction('auth.login', function (payload) {
   flux.log('¡' + payload.user_name + ' inició sesión! (user_id ' + payload.user_id + ')')
 })
@@ -13,14 +24,9 @@ flux.onAction('sale.confirmed', function (payload) {
   flux.log('venta #' + payload.sale_id + ' cobrada por ' + payload.total)
 })
 
-// Filter: modificar un valor en un punto sembrado. Devuelve el valor (modificado o
-// no). Descomenta para aplicar 10% de descuento a TODAS las ventas:
-// flux.onFilter('sale.total', function (total, ctx) {
-//   return total * 0.9
-// })
-
-// Datos para el client.js (los pide con flux.client.data()); ctx trae el usuario de
-// la sesión. Descomenta para probar:
+// DATA — el proveedor corre cada vez que el client.js llama flux.client.data(params):
+// los params llegan como ctx.params (strings); ctx.user trae el usuario de la sesión.
+// Descomenta para probar:
 // flux.onData(function (ctx) {
 //   return { saludo: 'hola ' + (ctx.user && ctx.user.name) }
 // })

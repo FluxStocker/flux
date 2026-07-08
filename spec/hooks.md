@@ -4,6 +4,11 @@ Contrato público: los hooks listados aquí mantienen nombre y payload dentro de
 misma versión mayor. **Añadir claves a un payload es seguro; quitarlas o
 renombrarlas, no.**
 
+> Registrar (`flux.onAction`/`flux.onFilter`) ocurre **una vez** al cargar el
+> complemento; el **handler** corre en el momento que indica cada entrada de este
+> catálogo — filters **antes** de persistir (modifican), actions **después**
+> (reaccionan). Ciclo de vida completo en [`flux.md`](flux.md).
+
 ## Actions
 
 Corren tras persistir la operación, fuera de cualquier transacción.

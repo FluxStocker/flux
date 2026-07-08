@@ -7,9 +7,13 @@ mayor nada publicado se rompe (añadir es seguro; renombrar o quitar, no).
 ## Documentos
 
 - [`manifest.md`](manifest.md) — el `manifest.json` de un complemento.
-- [`flux.md`](flux.md) — superficie de servidor: hooks (actions y filters) y utilidades.
-- [`flux-client.md`](flux-client.md) — superficie de navegador: paneles y toasts.
+- [`flux.md`](flux.md) — superficie de servidor y su ciclo de vida, en orden:
+  `log` → `onFilter` → `onAction` → `onData` → `db` → `notify`.
+- [`flux-client.md`](flux-client.md) — superficie de navegador: paneles, vistas,
+  datos y navegación.
 - [`hooks.md`](hooks.md) — catálogo de hooks sembrados (contrato).
+- [`scopes.md`](scopes.md) — catálogo de scopes de dominio: `flux.db.*` y `notify`
+  (contrato).
 - [`outlets.md`](outlets.md) — catálogo de posiciones visuales sembradas (contrato).
 
 ## Modelo de ejecución
@@ -21,8 +25,10 @@ Un complemento puede traer dos archivos de código, uno por mundo:
 | `main.js` | dentro del servidor FluxStock | intérprete JS embebido (~ES2017) | `flux` (global) |
 | `client.js` | navegador de cada usuario | motor nativo del navegador (módulo ES) | recibido como argumento |
 
-- `main.js` se ejecuta **una vez al arrancar** la aplicación: es la fase de registro.
-  Sus callbacks corren cada vez que el núcleo dispara el hook correspondiente.
+- `main.js` se ejecuta **una vez al cargar** el complemento (arranque de la app,
+  habilitarlo, o hot reload cuando `main.js` cambia en disco): es la fase de
+  registro. Sus callbacks corren cada vez que el núcleo dispara el hook
+  correspondiente.
 - `client.js` se importa al iniciar sesión y **exporta una función default** que
   recibe el puente de navegador.
 - Los dos mundos **no se comunican directamente**: servidor y navegador se hablan por
@@ -32,7 +38,9 @@ Un complemento puede traer dos archivos de código, uno por mundo:
 
 - Un solo archivo autocontenido. Sin `require`/`import`, sin APIs de Node ni de
   navegador. Los únicos globales garantizados: `flux` y `console` (alias de `flux.log`).
-- Los handlers corren de forma síncrona tras persistir la operación: deben ser
-  rápidos. Un error o panic en un handler se registra y no afecta al núcleo.
+- Los handlers corren de forma síncrona dentro del request de la operación — los
+  filters **antes** de validar/persistir (modifican el valor), las actions
+  **después** de persistir (reaccionan): deben ser rápidos. Un error o panic en un
+  handler se registra y no afecta al núcleo.
 - Se recomienda escribir en **TypeScript** y compilar a un único `main.js`
   (target ES2017) usando los tipos de [`types/`](../types/).

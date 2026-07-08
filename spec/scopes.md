@@ -11,6 +11,10 @@ Reglas:
   (`flux.db.products` es `undefined` si no declaraste `products.read`).
 - Contrato público: los scopes listados mantienen nombre y semántica dentro de la
   misma versión mayor. Los DTOs solo ganan campos, nunca los pierden.
+- **Tipado**: el scaffold genera `src/server/flux.d.ts` con estas fachadas y DTOs
+  tipados **según los scopes del manifest** (línea `ManifestScopes`, autogenerada al
+  guardar scopes en la UI): usar `flux.db.x` sin su scope es error de compilación,
+  igual que en runtime.
 
 ## `products.read`
 
@@ -47,6 +51,24 @@ Leer el registro de actividad (quién hizo qué y con qué resultado). Monta
 > El core acota lo que cada usuario ve (todo con `logs.view`, solo lo suyo con
 > `logs.view_own`). Un plugin de confianza replica esa política filtrando por
 > `user_id` con el usuario que le pasa `flux.onData(ctx)`.
+
+## `settings.read`
+
+Leer la configuración del negocio (tabla settings, key-value). Monta
+`flux.db.settings`. No pagina: es un conjunto fijo de claves.
+
+- `flux.db.settings.all()` → `Settings` (todas las claves publicadas, defaults
+  incluidos; la moneda llega resuelta desde el catálogo de monedas)
+- `flux.db.settings.get(key)` → `string` (`''` si la clave no está publicada)
+
+`Settings`: `{ business_name, tax_id, address, phone, email, logo, currency_code,
+currency_symbol, tax_rate, receipt_header, receipt_footer,
+weighted_stock_levels }` (todo strings; `logo` es ruta bajo `/storage/<logo>`,
+vacío = sin logo; `weighted_stock_levels` es `"1"` — costo ponderado — o `"0"` —
+lotes FIFO)
+
+> Solo se publican estas claves (lista blanca en el core); el resto de ajustes
+> internos no forma parte del contrato.
 
 ## `notify`
 
