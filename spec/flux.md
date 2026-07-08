@@ -1,25 +1,27 @@
 # `flux` — superficie de servidor
 
-Objeto global disponible en `main.js`. Es la **única** puerta del complemento hacia
-FluxStock: todo lo que no esté aquí, no existe para el complemento.
+Objeto global disponible en el código de SERVIDOR del complemento — la entrada
+`main` del manifest (`src/js/server/server.ts`, compilado a `dist/server.js`). Es la
+**única** puerta del complemento hacia FluxStock: todo lo que no esté aquí, no
+existe para el complemento.
 
 ## Ciclo de vida: registro vs ejecución
 
 Un complemento de servidor vive en **dos fases** — entenderlas evita el 90% de las
 confusiones:
 
-1. **Fase de REGISTRO** — el cuerpo de `main.js` corre **una sola vez**, cuando
+1. **Fase de REGISTRO** — el cuerpo del `main` corre **una sola vez**, cuando
    FluxStock carga el complemento: al arrancar la app, al habilitarlo desde
-   Complementos, o en el hot reload cuando `main.js` cambia en disco. Aquí el
-   complemento se **presenta**: escribe un log y registra sus callbacks
-   (`onFilter`, `onAction`, `onData`). Nada de negocio ocurre todavía.
+   Complementos, o en el hot reload cuando el compilado cambia en disco
+   (`npm run build`). Aquí el complemento se **presenta**: escribe un log y registra
+   sus callbacks (`onFilter`, `onAction`, `onData`). Nada de negocio ocurre todavía.
 2. **Fase de EJECUCIÓN** — cada callback registrado corre **cada vez** que su
    disparador ocurre. Cada uno tiene un disparador distinto (ver cada sección).
 
 Línea de tiempo de una venta, con los tres callbacks situados:
 
 ```
-main.js carga            → flux.log('cargado')  +  se registran los callbacks   (1 vez)
+main carga               → flux.log('cargado')  +  se registran los callbacks   (1 vez)
 ─────────────────────────────────────────────────────────────────────────────────────
 cajero confirma venta    → core suma líneas
                          → FILTER  sale.total   → tu handler AJUSTA el total    (antes de persistir)

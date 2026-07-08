@@ -11,7 +11,7 @@ Reglas:
   (`flux.db.products` es `undefined` si no declaraste `products.read`).
 - Contrato público: los scopes listados mantienen nombre y semántica dentro de la
   misma versión mayor. Los DTOs solo ganan campos, nunca los pierden.
-- **Tipado**: el scaffold genera `src/server/flux.d.ts` con estas fachadas y DTOs
+- **Tipado**: el scaffold genera `src/js/server/flux.d.ts` con estas fachadas y DTOs
   tipados **según los scopes del manifest** (línea `ManifestScopes`, autogenerada al
   guardar scopes en la UI): usar `flux.db.x` sin su scope es error de compilación,
   igual que en runtime.

@@ -1,8 +1,8 @@
-// Tipos de la superficie `flux` (lado servidor, main.js) — API 1.x (borrador).
-// Uso recomendado: escribir el plugin en TypeScript y compilar a un único main.js
-// (target ES2017, sin imports en runtime):
+// Tipos de la superficie `flux` (lado servidor, entrada `main` del manifest) —
+// API 1.x (borrador). Uso recomendado: escribir el plugin en TypeScript y compilar
+// a un único dist/server.js (target ES2017, sin imports en runtime):
 //
-//   esbuild src/main.ts --bundle --format=iife --target=es2017 --outfile=main.js
+//   esbuild src/js/server/server.ts --bundle --format=iife --target=es2017 --outfile=dist/server.js
 
 /** Payload de una action: mapa serializable definido en spec/hooks.md. */
 export type ActionPayload = Record<string, unknown>

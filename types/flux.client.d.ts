@@ -1,8 +1,8 @@
-// Tipos de la superficie `flux.client` (lado navegador, client.js) — API 1.x
-// (borrador). El client.js es un módulo ES que exporta una función default; puede
-// escribirse en TypeScript y compilarse a ESM:
+// Tipos de la superficie `flux.client` (lado navegador, entrada `client` del
+// manifest) — API 1.x (borrador). El client es un módulo ES que exporta una función
+// default; puede escribirse en TypeScript y compilarse a ESM:
 //
-//   esbuild src/client.ts --bundle --format=esm --outfile=client.js
+//   esbuild src/js/client/client.ts --bundle --format=esm --outfile=dist/client.js
 
 /** Contexto que la posición expone al render (spec/outlets.md). */
 export type PanelContext = Record<string, unknown>

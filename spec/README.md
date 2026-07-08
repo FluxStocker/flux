@@ -20,21 +20,24 @@ mayor nada publicado se rompe (añadir es seguro; renombrar o quitar, no).
 
 Un complemento puede traer dos archivos de código, uno por mundo:
 
-| Archivo | Dónde corre | Motor | Objeto puente |
+| Archivo (estructura actual) | Dónde corre | Motor | Objeto puente |
 |---|---|---|---|
-| `main.js` | dentro del servidor FluxStock | intérprete JS embebido (~ES2017) | `flux` (global) |
-| `client.js` | navegador de cada usuario | motor nativo del navegador (módulo ES) | recibido como argumento |
+| `dist/server.js` (entrada `main` del manifest) | dentro del servidor FluxStock | intérprete JS embebido (~ES2017) | `flux` (global) |
+| `dist/client.js` (entrada `client` del manifest) | navegador de cada usuario | motor nativo del navegador (módulo ES) | recibido como argumento |
 
-- `main.js` se ejecuta **una vez al cargar** el complemento (arranque de la app,
-  habilitarlo, o hot reload cuando `main.js` cambia en disco): es la fase de
-  registro. Sus callbacks corren cada vez que el núcleo dispara el hook
-  correspondiente.
-- `client.js` se importa al iniciar sesión y **exporta una función default** que
+Las rutas concretas las declara el manifest; la fuente vive en `src/` y **todo
+compilado sale a `dist/`** ([`manifest.md`](manifest.md)).
+
+- El **main** se ejecuta **una vez al cargar** el complemento (arranque de la app,
+  habilitarlo, o hot reload cuando el compilado cambia en disco — `npm run build`):
+  es la fase de registro. Sus callbacks corren cada vez que el núcleo dispara el
+  hook correspondiente.
+- El **client** se importa al iniciar sesión y **exporta una función default** que
   recibe el puente de navegador.
 - Los dos mundos **no se comunican directamente**: servidor y navegador se hablan por
   los canales normales de la aplicación.
 
-## Reglas del entorno servidor (`main.js`)
+## Reglas del entorno servidor (el `main`)
 
 - Un solo archivo autocontenido. Sin `require`/`import`, sin APIs de Node ni de
   navegador. Los únicos globales garantizados: `flux` y `console` (alias de `flux.log`).
@@ -42,5 +45,5 @@ Un complemento puede traer dos archivos de código, uno por mundo:
   filters **antes** de validar/persistir (modifican el valor), las actions
   **después** de persistir (reaccionan): deben ser rápidos. Un error o panic en un
   handler se registra y no afecta al núcleo.
-- Se recomienda escribir en **TypeScript** y compilar a un único `main.js`
-  (target ES2017) usando los tipos de [`types/`](../types/).
+- Se escribe en **TypeScript** (`src/js/server/server.ts`) y se compila a un único
+  `dist/server.js` (target ES2017) usando los tipos de [`types/`](../types/).
