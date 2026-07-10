@@ -52,6 +52,31 @@ FluxStock — puede cambiar entre versiones sin aviso. Para datos estables usa
 `flux.client.data()` y los scopes de dominio ([`scopes.md`](scopes.md)); la
 configuración del negocio viaja SOLO por el scope `settings.read`.
 
+## Extensiones de modelo (`kind: extension`)
+
+Un complemento `extension` extiende una o varias ENTIDADES del core: guarda datos
+propios (`flux.db.meta`) y, opcionalmente, pinta en la tabla y el formulario de esa
+entidad. Declara su alcance en el manifest (`entities`).
+
+Catálogo de entidades extensibles (entidad canónica → tabla en la UI):
+
+| Entidad (`entities`, `formField`) | Tabla (`column`) | Modelo |
+|---|---|---|
+| `product` | `products` | Productos |
+
+Puntos de siembra:
+
+- `flux.client.column(tabla, def)` — columna en la tabla. `def.render(row, meta)`
+  recibe la fila y los metadatos DEL PROPIO plugin para esa fila.
+- `flux.client.formField(entidad, def)` — campo en el formulario crear/editar.
+  `def.mount(el, ctx)`: `ctx.entityId` (null al crear), `ctx.values` (form del core,
+  lectura), `ctx.meta` (metadatos actuales del plugin), `ctx.setMeta(key, valor)`
+  (escribe el borrador que se persiste al guardar, vía `meta.write`).
+
+Registrar en una tabla/entidad fuera del catálogo no es error: simplemente no se
+pinta. Un `extension` solo puede escribir metadatos de las entidades que declaró en
+`entities`.
+
 ## Comportamiento responsive
 
 - **≥ 2xl (escritorio ancho)** — cada posición es un card fijo en el margen del

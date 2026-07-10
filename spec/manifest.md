@@ -27,11 +27,12 @@ Todo complemento vive en su propia carpeta (`storage/app/plugins/<name>/`) con u
 | `version` | ✅ | Versión del complemento (SemVer recomendado) |
 | `author` | — | `{ name, email }` — **calculado**: lo sella el host con el desarrollador autenticado al crear el complemento (UI o `plugin:make`); no se edita a mano |
 | `type` | ✅ | `script` (JS embebido) o `service` (proceso externo — en preparación) |
-| `kind` | — | Tipo visual: `panel` (card lateral) o `view` (página completa); por defecto `panel` |
+| `kind` | — | Tipo del complemento: `panel` (card lateral), `view` (página completa) o `extension` (extiende un modelo del core: sus datos vía `flux.db.meta` y, opcional, columnas/campos con `flux.client.column` / `formField`); por defecto `panel` |
 | `main` | ✅ | Entrada del lado servidor, relativa a la carpeta |
 | `client` | — | Entrada del lado navegador (módulo ES), relativa a la carpeta |
 | `image` | ✅ | Icono 500×500 del complemento, relativo a la carpeta |
 | `permissions` | — | Scopes de dominio que el complemento solicita ([`scopes.md`](scopes.md)); se muestran al administrador antes de habilitar |
+| `entities` | solo `extension` | Entidades del core que el complemento extiende ([`outlets.md`](outlets.md)); obligatoria (≥1) para `kind: extension`, ignorada en los demás. Acota qué metadatos puede escribir |
 
 Un manifest inválido deja el complemento visible en la pantalla de Complementos con
 el error explicado, y no se puede habilitar.

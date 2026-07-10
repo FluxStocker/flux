@@ -21,10 +21,36 @@ Reglas:
 Leer el catálogo de productos. Monta `flux.db.products`:
 
 - `flux.db.products.list(opts?)` → `{ data: Product[], total: number }`
-  - `opts`: `{ search?: string, active?: boolean, limit?: number (50, máx 200), offset?: number }`
+  - `opts`: `{ search?: string, active?: boolean, category_id?: number, limit?: number (50, máx 200), offset?: number }`
 - `flux.db.products.get(id)` → `Product | null`
 
-`Product`: `{ id, sku, name, description, cost, price, active, category: string|null, unit: string|null }`
+`Product`: `{ id, sku, name, description, cost, price, active, category: string|null,
+unit: string|null, currency: { code, symbol }|null, created_at: string }`
+
+## `products.create` / `products.update` / `products.delete`
+
+Intervenir el CICLO DE VIDA de un producto. No montan `flux.db.*` — **gatean hooks**:
+solo con el scope puedes registrar los handlers de esa operación (los filters
+modifican o vetan; los actions reaccionan). Los datos de esos hooks son acceso
+privilegiado, por eso no vienen con `products.read`. El admin ve al habilitar qué
+ciclos toca el complemento.
+
+| Scope | Hooks que habilita ([`hooks.md`](hooks.md)) |
+|---|---|
+| `products.create` | filter `product.creating` + action `product.created` |
+| `products.update` | filter `product.updating` + actions `product.updated`, `product.price_changed` |
+| `products.delete` | filter `product.deleting` (veto) + action `product.deleted` |
+
+Registrar un hook sin su scope no rompe el plugin: el handler se ignora y se loguea
+el motivo.
+
+```js
+// requiere products.update en el manifest
+flux.onFilter('product.updating', (attrs) => {
+  if (attrs.price < attrs.cost * 1.2) attrs.price = attrs.cost * 1.2
+  return attrs
+})
+```
 
 ## `sales.read`
 
@@ -69,6 +95,67 @@ lotes FIFO)
 
 > Solo se publican estas claves (lista blanca en el core); el resto de ajustes
 > internos no forma parte del contrato.
+
+## `meta.read` / `meta.write`
+
+METADATOS DE ENTIDADES: la vía para que un complemento EXTIENDA datos de un modelo
+del core (p. ej. un campo `image` en product) **sin tocar el esquema del core**. Las
+claves están namespaceadas por el slug del complemento: solo lees y escribes lo
+TUYO — imposible tocar metadatos de otro plugin. Montan `flux.db.meta`:
+
+Con `meta.read`:
+
+- `flux.db.meta.get(entity, id, key)` → valor (o `null`)
+- `flux.db.meta.forEntities(entity, ids)` → `{ [id]: { [key]: valor } }` (hidratar
+  un lote de golpe)
+
+Con `meta.write` (primer scope de ESCRITURA del catálogo — el admin lo ve tal cual):
+
+- `flux.db.meta.set(entity, id, key, valor)` — valor JSON-able, máx 64 KB
+- `flux.db.meta.delete(entity, id, key)`
+
+Reglas:
+
+- `entity` sale de una lista blanca; hoy: `product`. Crece entidad a entidad.
+- `key`: minúsculas, números y `-_.` (máx 100).
+- Eliminar el complemento del sistema borra TODOS sus metadatos.
+
+```js
+flux.db.meta.set('product', 42, 'image', 'https://cdn.ejemplo.com/cafe.jpg')
+const url = flux.db.meta.get('product', 42, 'image')
+```
+
+## `files.write`
+
+Subir archivos (imágenes, adjuntos) al ALMACÉN PROPIO del complemento, servidos
+públicamente bajo `/storage/…`. El core controla dónde y cómo se guarda (confinado a
+`plugins/<slug>/`, extensión en lista blanca, máx 5 MB) — el plugin nunca elige la
+ruta. Se usa desde el navegador:
+
+- `flux.client.upload(file)` → `Promise<string>` — sube y devuelve la URL pública.
+
+La URL NO se persiste sola: guárdala como metadato para asociarla a una entidad.
+
+```js
+export default function (flux) {
+  flux.client.formField('product', {
+    label: 'Imagen',
+    mount(el, ctx) {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'image/*'
+      input.onchange = async () => {
+        const url = await flux.client.upload(input.files[0]) // sube (files.write)
+        ctx.setMeta('image', url)                            // asocia (meta.write)
+      }
+      el.appendChild(input)
+    },
+  })
+}
+```
+
+Extensiones permitidas: `png, jpg, jpeg, webp, gif, svg, pdf`. Eliminar el
+complemento borra su almacén completo.
 
 ## `notify`
 
