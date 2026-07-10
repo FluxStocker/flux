@@ -121,6 +121,54 @@ flux.onData(function (ctx) {
 - Devuelve un valor JSON-able; el navegador lo recibe como `data`.
 - Corre en la VM del plugin, serializado con su candado: handler rápido.
 
+## `flux.validate(data, rules, messages?)`
+
+**Cuándo corre:** inmediatamente, cada vez que la llamas — en el cuerpo o dentro de
+cualquier callback. Función pura: no toca la DB ni el estado del core.
+
+Valida `data` con el **mismo motor de reglas que los formularios del core**
+(Goravel/gookit). `rules` mapea campo → reglas como string
+(`"required|url|max_len:500"`, `"numeric"`, `"in:a,b"`, `"regex:^…"`). Devuelve
+`{ fails, errors }` con `errors = { campo: { regla: mensaje } }`. `messages`
+(opcional) personaliza mensajes por `"campo.regla"` o `"regla"`.
+
+```js
+var v = flux.validate({ email: kv.email }, { email: 'required|email' })
+if (v.fails) flux.log(JSON.stringify(v.errors))
+```
+
+- Solo reglas sintácticas (sin `unique`/`exists` de base de datos).
+- No requiere scope.
+
+## `flux.onMetaValidate(handler)` — validador del form (por scope)
+
+**La llamada registra** el validador de metadatos (fase de registro; un complemento,
+un validador — el último vale). **El handler corre** cada vez que el core va a
+guardar una entidad cuyo formulario lleva metadatos de este complemento
+(`plugin_meta`), **ANTES de persistir**: con errores no se guarda nada. Requiere el
+scope `meta.write`.
+
+Contrato del handler `(kv, ctx)`:
+
+- `kv` — SOLO las claves de este complemento (el sello por slug se mantiene). Es
+  **mutable**: sanearlo en sitio (trim, normalizar) persiste lo saneado.
+- `ctx` — `{ entity, entity_id }`; `entity_id` `0` = creando.
+- **Devolver `{ clave: 'mensaje' }` rechaza el guardado** y el form del core pinta
+  esos mensajes bajo el campo del complemento. `undefined`/`null`/`{}` = pasa.
+- Un handler que lanza una excepción **no bloquea** (se loguea y el guardado sigue):
+  un plugin roto no tumba el core.
+
+```js
+flux.onMetaValidate(function (kv, ctx) {
+  kv.image = String(kv.image ?? '').trim()
+  if (!kv.image) return // opcional: vacío pasa
+  var v = flux.validate({ image: kv.image }, { image: 'max_len:500' })
+  if (v.fails) return { image: 'URL demasiado larga (máx 500).' }
+})
+```
+
+- Corre en la VM del plugin, serializado con su candado: handler rápido.
+
 ## `flux.db.*` — datos de dominio (por scope)
 
 **Cuándo corre:** inmediatamente, cada vez que la llamas — en el cuerpo o dentro de
